@@ -10,7 +10,7 @@ ARG STEAMCMDDIR="${HOMEDIR}/steamcmd"
 # handle locale warning (WARNING: setlocale('en_US.UTF-8'))
 
 RUN apt update \
-&& apt install -y curl lib32gcc-s1 locales \
+&& apt install -y curl wget lib32gcc-s1 locales \
 && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
 && apt-get autoremove -y \
 && apt-get clean \
@@ -22,7 +22,7 @@ RUN groupadd steam -g ${GROUP_ID}
 RUN useradd -g ${GROUP_ID} -u ${USER_ID} -m steam -d ${HOMEDIR}
 USER ${USER_ID}:${GROUP_ID}
 WORKDIR /home/steam/steamcmd
-RUN curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
+RUN wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
 RUN chown -R ${USER_ID}:${GROUP_ID} /home/steam
 RUN tar -xvf steamcmd_linux.tar.gz
 RUN rm -f steamcmd_linux.tar.gz
