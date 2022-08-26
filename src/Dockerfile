@@ -4,34 +4,46 @@ LABEL maintainer="adamho"
 # preset ids for groupadd and useradd cmds
 ARG USER_ID=1000
 ARG GROUP_ID=1000
-ARG HOMEDIR="/home/steam"
+ARG USER="steam"
+ARG HOMEDIR="/home/${USER}"
 ARG STEAMCMDDIR="${HOMEDIR}/steamcmd"
+ARG GAMEDIR="${HOMEDIR}/SatisfactoryDedicatedServer"
 
-# handle locale warning (WARNING: setlocale('en_US.UTF-8'))
-
+# necessary packages and install steps
 RUN apt update \
-&& apt install -y curl wget lib32gcc-s1 locales \
+&& apt install --no-install-recommends -y curl wget ca-certificates lib32gcc-s1 locales \
 && localedef -i en_US -c -f UTF-8 -A /usr/share/locale/locale.alias en_US.UTF-8 \
 && apt-get autoremove -y \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
-ENV LANG=en_US.UTF-8
-ENV LANGUAGE=en_US:en
+
+# env variables
+ENV LANG=en_US.utf8
+ENV LANGUAGE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
-RUN groupadd steam -g ${GROUP_ID}
-RUN useradd -g ${GROUP_ID} -u ${USER_ID} -m steam -d ${HOMEDIR}
+ENV HOMEDIR=${HOMEDIR}
+ENV GAMEDIR=${GAMEDIR}
+ENV STEAMCMDDIR=${STEAMCMDDIR}
+
+# steam user for download & install
+RUN groupadd steam -g ${GROUP_ID} \
+&& useradd -g ${GROUP_ID} -u ${USER_ID} -m ${USER}\
+&& chown -R ${USER_ID}:${GROUP_ID} ${HOMEDIR} \
+&& mkdir -p ${STEAMCMDDIR} \
+&& chown -R ${USER_ID}:${GROUP_ID} ${STEAMCMDDIR} \
+&& mkdir -p ${GAMEDIR} \
+&& chown -R ${USER_ID}:${GROUP_ID} ${GAMEDIR} \
+&& mkdir -p ${HOMEDIR}/.config/Epic/FactoryGame/Saved/SaveGames \
+&& mkdir -p ${HOMEDIR}/.steam/sdk64 \
+&& chown -R ${USER_ID}:${GROUP_ID} ${HOMEDIR}/.config/Epic/FactoryGame/Saved/SaveGames \
+&& ln -s ${STEAMCMDDIR}/linux64/steamclient.so ${HOMEDIR}/.steam/sdk64/steamclient.so
 USER ${USER_ID}:${GROUP_ID}
-RUN chown -R ${USER_ID}:${GROUP_ID} /home/steam && mkdir -p /home/steam/steamcmd
-WORKDIR /home/steam/steamcmd
-RUN wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
-RUN tar -xvf steamcmd_linux.tar.gz
-RUN rm -f steamcmd_linux.tar.gz
-RUN ./steamcmd.sh +force_install_dir ~/SatisfactoryDedicatedServer +login anonymous +app_update 1690800 validate +quit
-RUN chown -R ${USER_ID}:${GROUP_ID} /home/steam/SatisfactoryDedicatedServer \
-&& mkdir -p /home/steam/.config/Epic/FactoryGame/Saved/SaveGames \
-&& mkdir -p /home/steam/.steam/sdk64 \
-&& chown -R ${USER_ID}:${GROUP_ID} /home/steam/.config/Epic/FactoryGame/Saved/SaveGames
-RUN ln -s /home/steam/steamcmd/linux64/steamclient.so /home/steam/.steam/sdk64/steamclient.so
+WORKDIR ${STEAMCMDDIR}
+RUN wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" \
+&& tar -xvf steamcmd_linux.tar.gz \
+&& rm -f steamcmd_linux.tar.gz \
+&& ./steamcmd.sh +quit
+COPY --chown=${USER_ID}:${GROUP_ID} start.sh ${HOMEDIR}/start.sh
 EXPOSE 15777/UDP 7777/UDP 15000/UDP
-CMD ["/home/steam/SatisfactoryDedicatedServer/FactoryServer.sh"]
+CMD /bin/sh ${HOMEDIR}/start.sh
 
