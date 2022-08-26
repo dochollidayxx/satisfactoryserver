@@ -14,5 +14,5 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Build the Docker image
+    - name: Build the Docker image (maybe)
       run: docker build . --file ./src/Dockerfile --tag satisfactoryserver:$(date +%s)
