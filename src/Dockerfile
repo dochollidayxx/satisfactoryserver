@@ -20,7 +20,7 @@ ENV LANGUAGE=en_US:en
 ENV LC_ALL=en_US.UTF-8
 RUN groupadd steam -g ${GROUP_ID}
 RUN useradd -g ${GROUP_ID} -u ${USER_ID} -m steam -d ${HOMEDIR}
-USER steam
+USER ${USER_ID}:${GROUP_ID}
 WORKDIR /home/steam/steamcmd
 RUN curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" | tar zxvf - \
 && rm -f steamcmd_linux.tar.gz
