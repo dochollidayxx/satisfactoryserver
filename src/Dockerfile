@@ -37,7 +37,7 @@ RUN groupadd steam -g ${GROUP_ID} \
 && mkdir -p ${HOMEDIR}/.steam/sdk64 \
 && chown -R ${USER_ID}:${GROUP_ID} ${HOMEDIR}/.config/Epic/FactoryGame/Saved/SaveGames \
 && ln -s ${STEAMCMDDIR}/linux64/steamclient.so ${HOMEDIR}/.steam/sdk64/steamclient.so
-USER ${USER_ID}:${GROUP_ID}
+#USER ${USER_ID}:${GROUP_ID}
 WORKDIR ${STEAMCMDDIR}
 RUN wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" \
 && tar -xvf steamcmd_linux.tar.gz \

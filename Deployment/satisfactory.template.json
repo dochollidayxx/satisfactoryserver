@@ -1,0 +1,133 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "variables": {
+        "gameName": "satisfactory",
+        "stAccountName": "[concat('st',toLower(variables('gameName')))]",
+        "configFsName": "[concat('fsconfig', toLower(variables('gameName')))]",
+        "binFsName": "[concat('fsgamebin', toLower(variables('gameName')))]",
+        "ciName": "[concat('ci', toLower(variables('gameName')))]",
+        "containerName": "[concat(toLower(variables('gameName')), 'server')]",
+        "containerImage": "dochollidayxx/satisfactoryserver:latest"
+    },
+    "resources": [
+        {
+            "name": "[variables('stAccountName')]",
+            "type": "Microsoft.Storage/storageAccounts",
+            "apiVersion": "2021-04-01",
+            "tags": {
+                "displayName": "[variables('stAccountName')]"
+            },
+            "location": "[resourceGroup().location]",
+            "kind": "FileStorage",
+            "sku": {
+                "name": "Premium_LRS",
+                "tier": "Premium"
+            }
+        },
+        {
+            "name": "[format('{0}/default/{1}', variables('stAccountName'), variables('configFsName'))]",
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2021-04-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('stAccountName'))]"
+            ]
+        },
+        {
+            "name": "[format('{0}/default/{1}', variables('stAccountName'), variables('binFsName'))]",
+            "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+            "apiVersion": "2021-04-01",
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('stAccountName'))]"
+            ]
+        },
+        {
+            "name": "[variables('ciName')]",
+            "type": "Microsoft.ContainerInstance/containerGroups",
+            "apiVersion": "2021-03-01",
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "containers": [
+                    {
+                        "name": "[variables('containerName')]",
+                        "properties": {
+                            "image": "[variables('containerImage')]",
+                            "ports": [
+                                {
+                                    "port": 15000,
+                                    "protocol": "UDP"
+                                },
+                                {
+                                    "port": 15777,
+                                    "protocol": "UDP"
+                                },
+                                {
+                                    "port": 7777,
+                                    "protocol": "UDP"
+                                }
+                            ],
+                            "resources": {
+                                "requests": {
+                                    "cpu": 1,
+                                    "memoryInGB": 10
+                                }
+                            },
+                            "volumeMounts": [
+                                {
+                                    "mountPath": "/home/steam/SatisfactoryDedicatedServer",
+                                    "name": "[variables('binFsName')]"
+                                },
+                                {
+                                    "mountPath": "/home/steam/.config",
+                                    "name": "[variables('configFsName')]"
+                                }
+                            ]
+                        }
+                    }
+                ],
+                "osType": "Linux",
+                "ipAddress": {
+                    "type": "Public",
+                    "ports": [
+                        {
+                            "port": 15000,
+                            "protocol": "UDP"
+                        },
+                        {
+                            "port": 15777,
+                            "protocol": "UDP"
+                        },
+                        {
+                            "port": 7777,
+                            "protocol": "UDP"
+                        }
+                    ],
+                    "dnsNameLabel": "futilesat"
+                },
+                "volumes": [
+                    {
+                        "name": "[variables('binFsName')]",
+                        "azureFile": {
+                            "shareName": "[variables('binFsName')]",
+                            "storageAccountKey": "[listKeys(variables('stAccountName'), '2019-06-01').keys[0].value]",
+                            "storageAccountName": "[variables('stAccountName')]"
+                        }
+                    },
+                    {
+                        "name": "[variables('configFsName')]",
+                        "azureFile": {
+                            "shareName": "[variables('configFsName')]",
+                            "storageAccountKey": "[listKeys(variables('stAccountName'), '2019-06-01').keys[0].value]",
+                            "storageAccountName": "[variables('stAccountName')]"
+                        }
+                    }
+                ]
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Storage/storageAccounts', variables('stAccountName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('stAccountName'), 'default',variables('binFsName'))]",
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('stAccountName'), 'default',variables('binFsName'))]"
+            ]
+        }
+    ]
+}
