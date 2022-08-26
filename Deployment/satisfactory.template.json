@@ -5,7 +5,6 @@
         "gameName": "satisfactory",
         "stAccountName": "[concat('st',toLower(variables('gameName')))]",
         "configFsName": "[concat('fsconfig', toLower(variables('gameName')))]",
-        "binFsName": "[concat('fsgamebin', toLower(variables('gameName')))]",
         "ciName": "[concat('ci', toLower(variables('gameName')))]",
         "containerName": "[concat(toLower(variables('gameName')), 'server')]",
         "containerImage": "dochollidayxx/satisfactoryserver:latest"
@@ -66,10 +65,6 @@
                             },
                             "volumeMounts": [
                                 {
-                                    "mountPath": "/home/steam/SatisfactoryDedicatedServer",
-                                    "name": "[variables('binFsName')]"
-                                },
-                                {
                                     "mountPath": "/home/steam/.config",
                                     "name": "[variables('configFsName')]"
                                 }
@@ -109,8 +104,7 @@
             },
             "dependsOn": [
                 "[resourceId('Microsoft.Storage/storageAccounts', variables('stAccountName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('stAccountName'), 'default',variables('binFsName'))]",
-                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('stAccountName'), 'default',variables('binFsName'))]"
+                "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', variables('stAccountName'), 'default',variables('configFsName'))]"
             ]
         }
     ]
