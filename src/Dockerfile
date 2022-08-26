@@ -43,6 +43,7 @@ RUN wget "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz
 && tar -xvf steamcmd_linux.tar.gz \
 && rm -f steamcmd_linux.tar.gz \
 && ./steamcmd.sh +quit
+RUN ${STEAMCMDDIR}/steamcmd.sh +force_install_dir $GAMEDIR +login anonymous +app_update 1690800 validate +quit
 COPY --chown=${USER_ID}:${GROUP_ID} start.sh ${HOMEDIR}/start.sh
 EXPOSE 15777/UDP 7777/UDP 15000/UDP
 USER root
