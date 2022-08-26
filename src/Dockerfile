@@ -22,10 +22,10 @@ RUN groupadd steam -g ${GROUP_ID}
 RUN useradd -g ${GROUP_ID} -u ${USER_ID} -m steam -d ${HOMEDIR}
 USER ${USER_ID}:${GROUP_ID}
 WORKDIR /home/steam/steamcmd
-RUN curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz" \
-&& chown -R ${USER_ID}:${GROUP_ID} /home/steam \
-&& tar -xvf steamcmd_linux.tar.gz \
-&& rm -f steamcmd_linux.tar.gz
+RUN curl -sqL "https://steamcdn-a.akamaihd.net/client/installer/steamcmd_linux.tar.gz"
+RUN chown -R ${USER_ID}:${GROUP_ID} /home/steam
+RUN tar -xvf steamcmd_linux.tar.gz
+RUN rm -f steamcmd_linux.tar.gz
 RUN ./steamcmd.sh +force_install_dir ~/SatisfactoryDedicatedServer +login anonymous +app_update 1690800 validate +quit
 RUN chown -R ${USER_ID}:${GROUP_ID} /home/steam/SatisfactoryDedicatedServer \
 && mkdir -p /home/steam/.config/Epic/FactoryGame/Saved/SaveGames \
