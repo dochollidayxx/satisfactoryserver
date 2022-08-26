@@ -32,5 +32,7 @@ jobs:
         file: ./src/Dockerfile
         push: true
         tags: ${{ secrets.DOCKER_HUB_USERNAME }}/satisfactoryserver:latest
+        cache-from: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/satisfactoryserver:buildcache
+        cache-to: type=registry,ref=${{ secrets.DOCKER_HUB_USERNAME }}/satisfactoryserver:buildcach,mode=max
 
 
