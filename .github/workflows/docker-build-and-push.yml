@@ -28,6 +28,6 @@ jobs:
         file: ./src/Dockerfile
         push: true
         tags: |
-          ${{ secrets.DOCKER_HUB_USERNAME }}/satisfactoryserver:latest 
+          ${{ secrets.DOCKER_HUB_USERNAME }}/satisfactoryserver:latest ,
           ${{ secrets.DOCKER_HUB_USERNAME }}/satisfactoryserver:$(date +%s)
 
