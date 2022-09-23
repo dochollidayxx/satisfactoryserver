@@ -8,6 +8,7 @@ ARG USER="steam"
 ARG HOMEDIR="/home/${USER}"
 ARG STEAMCMDDIR="${HOMEDIR}/steamcmd"
 ARG GAMEDIR="${HOMEDIR}/SatisfactoryDedicatedServer"
+ARG GAMEVER=6
 
 # necessary packages and install steps
 RUN apt update \
@@ -23,6 +24,7 @@ ENV LANGUAGE=en_US.UTF-8
 ENV LC_ALL=en_US.UTF-8
 ENV HOMEDIR=${HOMEDIR}
 ENV GAMEDIR=${GAMEDIR}
+ENV GAMEVER=${GAMEVER}
 ENV STEAMCMDDIR=${STEAMCMDDIR}
 ENV PUID=${USER_ID}
 ENV GUID=${GROUP_ID}
