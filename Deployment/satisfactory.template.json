@@ -60,7 +60,7 @@
                             "resources": {
                                 "requests": {
                                     "cpu": 2,
-                                    "memoryInGB": 8
+                                    "memoryInGB": 12
                                 }
                             },
                             "volumeMounts": [
