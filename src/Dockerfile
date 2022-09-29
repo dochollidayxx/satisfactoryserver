@@ -8,7 +8,7 @@ ARG USER="steam"
 ARG HOMEDIR="/home/${USER}"
 ARG STEAMCMDDIR="${HOMEDIR}/steamcmd"
 ARG GAMEDIR="${HOMEDIR}/SatisfactoryDedicatedServer"
-ARG GAMEVER=601
+ARG GAMEVER=602
 
 # necessary packages and install steps
 RUN apt update \
